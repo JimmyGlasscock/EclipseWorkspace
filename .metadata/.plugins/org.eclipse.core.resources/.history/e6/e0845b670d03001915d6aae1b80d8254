@@ -1,0 +1,69 @@
+package excelFormatter;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Scanner;
+ 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+ 
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+
+public class Main {
+	
+	int columnOne, columnTwo;
+	
+	String choice, filePath = "/Users/admin/Downloads/subscribed_members_export_d2cf8b342a.csv";
+	
+	public static void main(String args[]){
+		Main main = new Main();
+		main.prompt();
+	}
+	
+	public void prompt(){
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Which columns are we combining?");
+		System.out.println("First column:");
+		columnOne = scanner.nextInt();
+		System.out.println("Second column:");
+		columnTwo = scanner.nextInt();
+		
+		System.out.println("First Column: " + columnOne + " Second Column: " + columnTwo + "\n");
+		System.out.println("is this correct? (y for yes, n for no)\n");
+		choice = scanner.next();
+		
+		if(choice.equalsIgnoreCase("y")){
+			combineColumns(columnOne, columnTwo);
+		}else{
+			prompt();
+		}
+	}
+	
+	public void combineColumns(int colOne, int colTwo){
+		try{
+			FileInputStream inputStream = new FileInputStream(new File(filePath));
+			Workbook workbook = WorkbookFactory.create(inputStream);
+			Sheet sheet = workbook.getSheetAt(0);
+			
+			int numberOfRows = sheet.getLastRowNum();
+			
+			for(int i= 0; i > numberOfRows; i++){
+				//Compare the values of Column 1 & 2, and keep the data in the proper format
+				
+			}
+			System.out.println("\n" + sheet.getRow(colOne));
+			
+		}catch(IOException | EncryptedDocumentException ex){
+			ex.printStackTrace();
+		}
+	}
+	
+}

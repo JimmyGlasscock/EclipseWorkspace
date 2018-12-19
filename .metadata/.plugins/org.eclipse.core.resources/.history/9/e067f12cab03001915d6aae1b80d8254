@@ -1,0 +1,98 @@
+package excelFormatter;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Scanner;
+
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+
+public class Main {
+	
+	int columnOne, columnTwo;
+	
+	String choice, filePath = "/Users/admin/Desktop/subscribed_members_export_d2cf8b342a.xlsx";
+	
+	public static void main(String args[]){
+		Main main = new Main();
+		main.prompt();
+	}
+	
+	public void prompt(){
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Which columns are we combining?");
+		System.out.println("First column:");
+		columnOne = scanner.nextInt();
+		System.out.println("Second column:");
+		columnTwo = scanner.nextInt();
+		
+		System.out.println("First Column: " + columnOne + " Second Column: " + columnTwo + "\n");
+		System.out.println("is this correct? (y for yes, n for no)\n");
+		choice = scanner.next();
+		
+		if(choice.equalsIgnoreCase("y")){
+			combineColumns(columnOne, columnTwo);
+		}else{
+			prompt();
+		}
+	}
+	
+	public void combineColumns(int colOne, int colTwo){
+		try{
+			FileInputStream inputStream = new FileInputStream(new File(filePath));
+			Workbook workbook = WorkbookFactory.create(inputStream);
+			Sheet sheet = workbook.getSheetAt(0);
+			
+			int numberOfRows = sheet.getLastRowNum();
+			
+			int newCol = colOne;
+			colOne++;
+			colTwo++;
+			
+			for(int i = 1; i < numberOfRows; i++){
+				
+				sheet.createRow(i).createCell(newCol);
+				
+				if(sheet.getRow(i).getCell(colOne) != null && sheet.getRow(i).getCell(colTwo) != null){
+					if(sheet.getRow(i).getCell(colOne).toString().equals(sheet.getRow(i).getCell(colTwo).toString())){
+						System.out.println("(" + colOne + "," + i + ") and (" + colTwo + "," + i + ") are equal");
+						sheet.getRow(i).getCell(newCol).setCellValue(sheet.getRow(i).getCell(colOne).toString());
+					}
+					
+					if(sheet.getRow(i).getCell(colOne).toString().length() < sheet.getRow(i).getCell(colTwo).toString().length()){
+						sheet.getRow(i).getCell(newCol).setCellValue(sheet.getRow(i).getCell(colTwo).toString());
+						System.out.println("Copied cell (" + colTwo + "," + i + ") to (" + newCol + "," + i + ")");
+					}
+					if(sheet.getRow(i).getCell(colOne).toString().length() > sheet.getRow(i).getCell(colTwo).toString().length()){
+						sheet.getRow(i).getCell(newCol).setCellValue(sheet.getRow(i).getCell(colOne).toString());
+						System.out.println("Copied cell (" + colOne + "," + i + ") to (" + newCol + "," + i + ")");
+					}
+				}else{
+					if(sheet.getRow(i).getCell(colOne) != null){
+						sheet.getRow(i).getCell(newCol).setCellValue(sheet.getRow(i).getCell(colOne).toString());
+						System.out.println("Copied cell (" + colOne + "," + i + ") to (" + newCol + "," + i + ")");
+					}
+					if(sheet.getRow(i).getCell(colTwo) != null){
+						sheet.getRow(i).getCell(newCol).setCellValue(sheet.getRow(i).getCell(colTwo).toString());
+						System.out.println("Copied cell (" + colTwo + "," + i + ") to (" + newCol + "," + i + ")");
+					}
+				}
+			}
+			
+			inputStream.close();
+			
+			FileOutputStream outputStream = new FileOutputStream(filePath);
+			workbook.write(outputStream);
+			workbook.close();
+			outputStream.close();
+		
+		}catch(IOException | EncryptedDocumentException ex){
+			ex.printStackTrace();
+		}
+	}
+	
+}
